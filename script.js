@@ -1,6 +1,3 @@
-# Final corrected version of script.js with tab fix and tone dropdown initialization
-
-script_fixed = """
 document.addEventListener("DOMContentLoaded", function () {
   const offerToTones = {
     sellerFinance: [
@@ -19,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const offer = offerTypeSelect.value;
     toneStyleSelect.innerHTML = "";
     if (!offerToTones[offer]) return;
+
     offerToTones[offer].forEach(tone => {
       const option = document.createElement("option");
       option.value = tone.value;
@@ -28,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   offerTypeSelect.addEventListener("change", populateToneOptions);
-  populateToneOptions(); // populate tones on page load
+  populateToneOptions(); // Run once at load
 
   const fieldMap = {
     1: "propertyAddress",
@@ -47,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("parseBtn").addEventListener("click", function () {
     const raw = document.getElementById("tsvInput").value.trim();
-    const values = raw.split("\\t").length === 1 ? raw.split("\t") : raw.split("\\t");
+    const values = raw.split("\t");
 
     for (const [i, id] of Object.entries(fieldMap)) {
       if (values[i]) {
@@ -101,10 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const toneData = await response.json();
 
       const body = toneData.sections.map(section => {
-        return section.replace(/{{(\\w+?)}}/g, (_, key) => formData[key] || '');
+        return section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
       }).join("<br><br>");
 
-      const subject = toneData.subject.replace(/{{(\\w+?)}}/g, (_, key) => formData[key] || '');
+      const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
       const outputHtml = `<strong>Subject:</strong> ${subject}<br><br>${body}`;
 
       const outputDiv = document.getElementById("output");
@@ -131,11 +129,3 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-"""
-
-# Save it to a new downloadable script.js file
-script_path = "/mnt/data/fixed-script.js"
-with open(script_path, "w") as f:
-    f.write(script_fixed)
-
-script_path
