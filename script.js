@@ -85,18 +85,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }).format(number);
   }
 
-  document.getElementById("generateBtn").addEventListener("click", async function () {
+document.getElementById("generateBtn").addEventListener("click", async function () {
   const offerType = offerTypeSelect.value;
 
   // 🧠 Recalculate Purchase Price = 68% of Listed Price if offer is cash
-if (offerType === "cash") {
-  const rawTSV = document.getElementById("tsvInput").value.trim();
-  const tsvValues = rawTSV.split("\t");
-  const listPrice = parseFloat(tsvValues[4] || 0);
-  if (!isNaN(listPrice)) {
-    document.getElementById("purchasePrice").value = (listPrice * 0.68).toFixed(0);
+  let calcPrice = document.getElementById("purchasePrice").value; // fallback
+
+  if (offerType === "cash") {
+    const rawTSV = document.getElementById("tsvInput").value.trim();
+    const tsvValues = rawTSV.split("\t");
+    const listPrice = parseFloat(tsvValues[4] || 0); // List Price = TSV column 5
+    if (!isNaN(listPrice)) {
+      calcPrice = (listPrice * 0.68).toFixed(0);
+      document.getElementById("purchasePrice").value = calcPrice;
+    }
   }
-}
 
   const tone = toneStyleSelect.value;
   const toneFile = `tones/${offerType}-${tone}.json`;
@@ -104,7 +107,7 @@ if (offerType === "cash") {
   const formData = {
     agent: document.getElementById("agentName").value,
     address: document.getElementById("propertyAddress").value,
-    price: formatCurrency(document.getElementById("purchasePrice").value),
+    price: formatCurrency(calcPrice), // ✅ always use updated value
     down: formatCurrency(document.getElementById("downPayment").value),
     monthly: formatCurrency(document.getElementById("monthlyPayment").value),
     rate: parseFloat(document.getElementById("interestRate").value || 0).toFixed(2) + '%',
@@ -140,6 +143,7 @@ if (offerType === "cash") {
     document.getElementById("output").innerHTML = `<div style="color:red;">Failed to load tone template: ${err.message}</div>`;
   }
 });
+
 
   document.getElementById("copyBtn").addEventListener("click", async function () {
     const htmlContent = document.getElementById("output").innerHTML;
