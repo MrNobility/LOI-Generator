@@ -2,11 +2,14 @@ if (!window.BulkLOI) window.BulkLOI = {};
 const BulkLOI = window.BulkLOI;
 
 BulkLOI.parseTSVInput = function(tsvText) {
-  const lines = tsvText.trim().split('\n').filter(line => line.trim() !== "");
+  console.log("Raw TSV text:", JSON.stringify(tsvText));  // See what's being passed
+
+  const cleanedText = tsvText.replace(/^\uFEFF/, '');
+  const lines = cleanedText.trim().split('\n').filter(line => line.trim() !== "");
   const rows = lines.map(line => line.split('\t'));
 
   if (!rows.length || rows[0].length < 2) {
-    console.error("TSV data is empty or malformed.");
+    console.error("TSV data is empty or malformed. Raw rows:", rows);
     return [];
   }
 
