@@ -104,10 +104,23 @@ document.getElementById("generateBtn").addEventListener("click", async function 
   const tone = toneStyleSelect.value;
   const toneFile = `tones/${offerType}-${tone}.json`;
 
+let calcPrice = document.getElementById("purchasePrice").value;
+
+if (offerType === "cash") {
+  const rawTSV = document.getElementById("tsvInput").value.trim();
+  const tsvValues = rawTSV.split("\t");
+  const listPrice = parseFloat(tsvValues[4] || 0); // column 5 = index 4
+  if (!isNaN(listPrice)) {
+    calcPrice = (listPrice * 0.68).toFixed(0);
+    document.getElementById("purchasePrice").value = calcPrice;
+  }
+}
+
+  
   const formData = {
     agent: document.getElementById("agentName").value,
     address: document.getElementById("propertyAddress").value,
-    price: formatCurrency(calcPrice), // ✅ always use updated value
+    price: formatCurrency(calcPrice),
     down: formatCurrency(document.getElementById("downPayment").value),
     monthly: formatCurrency(document.getElementById("monthlyPayment").value),
     rate: parseFloat(document.getElementById("interestRate").value || 0).toFixed(2) + '%',
