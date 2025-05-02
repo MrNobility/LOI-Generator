@@ -140,3 +140,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+window.generateLOI = function(data) {
+  return `
+    <div>
+      <p><strong>Address:</strong> ${data["Full Address"] || "N/A"}</p>
+      <p><strong>Offer Type:</strong> ${data.offerType}</p>
+      <p><strong>Tone:</strong> ${data.toneStyle}</p>
+    </div>
+  `;
+};
