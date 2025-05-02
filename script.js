@@ -88,39 +88,29 @@ document.addEventListener("DOMContentLoaded", function () {
 document.getElementById("generateBtn").addEventListener("click", async function () {
   const offerType = offerTypeSelect.value;
 
-  // Step 1: Pre-calculate the correct purchase price for Cash
+  // Step 1: Precalculate purchase price if cash offer
   let calcPrice = parseFloat(document.getElementById("purchasePrice").value || 0);
 
   if (offerType === "cash") {
     const rawTSV = document.getElementById("tsvInput").value.trim();
     const tsvValues = rawTSV.split("\t");
-    const listPrice = parseFloat(tsvValues[4] || 0); // column 5 = list price
+    const listPrice = parseFloat(tsvValues[3] || 0); // ✅ Column 4 = index 3
     if (!isNaN(listPrice) && listPrice > 0) {
       calcPrice = listPrice * 0.68;
+
+      // 🧠 Pro Tip: show integer in the input field (no cents)
       document.getElementById("purchasePrice").value = calcPrice.toFixed(0);
     }
   }
 
+  // Step 2: Build the formData using the updated calcPrice
   const tone = toneStyleSelect.value;
   const toneFile = `tones/${offerType}-${tone}.json`;
 
-let calcPrice = document.getElementById("purchasePrice").value;
-
-if (offerType === "cash") {
-  const rawTSV = document.getElementById("tsvInput").value.trim();
-  const tsvValues = rawTSV.split("\t");
-  const listPrice = parseFloat(tsvValues[4] || 0); // column 5 = index 4
-  if (!isNaN(listPrice)) {
-    calcPrice = (listPrice * 0.68).toFixed(0);
-    document.getElementById("purchasePrice").value = calcPrice;
-  }
-}
-
-  
   const formData = {
     agent: document.getElementById("agentName").value,
     address: document.getElementById("propertyAddress").value,
-    price: formatCurrency(calcPrice),
+    price: formatCurrency(calcPrice), // ✅ format the true numeric value here
     down: formatCurrency(document.getElementById("downPayment").value),
     monthly: formatCurrency(document.getElementById("monthlyPayment").value),
     rate: parseFloat(document.getElementById("interestRate").value || 0).toFixed(2) + '%',
@@ -134,6 +124,10 @@ if (offerType === "cash") {
     yourPhone: document.getElementById("yourPhone").value,
     yourEmail: document.getElementById("yourEmail").value
   };
+
+  // ...then fetch tone file + generate output as before
+});
+
 
   try {
     const response = await fetch(toneFile);
