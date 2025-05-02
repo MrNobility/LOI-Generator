@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-    const listPrice = parseFloat(values[3] || 0);
+    const listPrice = parseFloat(values[4] || 0);
     const purchaseField = document.getElementById("purchasePrice");
     const offerType = offerTypeSelect.value;
    
@@ -82,14 +82,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const offerType = offerTypeSelect.value;
 
   // 🧠 Recalculate Purchase Price = 68% of Listed Price if offer is cash
-  if (offerType === "cash") {
-    const rawTSV = document.getElementById("tsvInput").value.trim();
-    const tsvValues = rawTSV.split("\t");
-    const listPrice = parseFloat(tsvValues[3] || 0);
-    if (!isNaN(listPrice)) {
-      document.getElementById("purchasePrice").value = (listPrice * 0.68).toFixed(0);
-    }
+if (offerType === "cash") {
+  const rawTSV = document.getElementById("tsvInput").value.trim();
+  const tsvValues = rawTSV.split("\t");
+  const listPrice = parseFloat(tsvValues[4] || 0);
+  if (!isNaN(listPrice)) {
+    document.getElementById("purchasePrice").value = (listPrice * 0.68).toFixed(0);
   }
+}
 
   const tone = toneStyleSelect.value;
   const toneFile = `tones/${offerType}-${tone}.json`;
