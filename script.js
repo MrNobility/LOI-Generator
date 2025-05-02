@@ -59,12 +59,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const purchaseField = document.getElementById("purchasePrice");
     const offerType = offerTypeSelect.value;
    
-    if (offerType === "cash") {
-  const listPriceInput = parseFloat(document.getElementById("listedPrice")?.value || 0);
-  if (!isNaN(listPriceInput) && listPriceInput > 0) {
-    document.getElementById("purchasePrice").value = (listPriceInput * 0.68).toFixed(0);
+  if (offerType === "cash") {
+  const rawTSV = document.getElementById("tsvInput").value.trim();
+  const tsvValues = rawTSV.split("\t");
+  const listPrice = parseFloat(tsvValues[3] || 0);
+  if (!isNaN(listPrice)) {
+    const calc = (listPrice * 0.68).toFixed(0);
+    document.getElementById("purchasePrice").value = calc;
+
+    // ✅ Immediately override in formData
+    formData.price = formatCurrency(calc);
   }
 }
+
     if (offerType === "cash" && !purchaseField.value && !isNaN(listPrice)) {
       purchaseField.value = (listPrice * 0.68).toFixed(0);
     }
