@@ -1,11 +1,14 @@
 function parseTSVInput(tsvText) {
-  const lines = tsvText.trim().split('\n').filter(Boolean);
+  const lines = tsvText.trim().split('\n').filter(line => line.trim() !== "");
   const rows = lines.map(line => line.split('\t'));
 
-  if (!rows.length) return [];
+  if (!rows.length || !Array.isArray(rows[0]) || rows[0].length < 2) {
+    console.error("TSV input is malformed or missing data.");
+    return [];
+  }
 
   const headersPresent = rows[0][0]?.toLowerCase().includes("timestamp");
-  if (headersPresent) rows.shift(); // skip header row
+  if (headersPresent) rows.shift(); // Remove header row if present
 
   return rows.map((row, i) => {
     const deal = {
@@ -21,8 +24,8 @@ function parseTSVInput(tsvText) {
       "Monthly Taxes": row[11],
       "Close of Escrow": row[18],
       "EMD": row[19],
-      "offerType": row[30],     // optional override
-      "toneStyle": row[31],     // optional override
+      "offerType": row[30],
+      "toneStyle": row[31],
       "__rowIndex": i + 1
     };
     return deal;
