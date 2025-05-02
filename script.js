@@ -79,49 +79,60 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.getElementById("generateBtn").addEventListener("click", async function () {
-    const offerType = offerTypeSelect.value;
-    const tone = toneStyleSelect.value;
-    const toneFile = `tones/${offerType}-${tone}.json`;
+  const offerType = offerTypeSelect.value;
 
-    const formData = {
-      agent: document.getElementById("agentName").value,
-      address: document.getElementById("propertyAddress").value,
-      price: formatCurrency(document.getElementById("purchasePrice").value),
-      down: formatCurrency(document.getElementById("downPayment").value),
-      monthly: formatCurrency(document.getElementById("monthlyPayment").value),
-      rate: parseFloat(document.getElementById("interestRate").value || 0).toFixed(2) + '%',
-      balloon: document.getElementById("balloonTerm").value + " years",
-      amort: document.getElementById("amortization").value + " years",
-      insurance: formatCurrency(document.getElementById("insurance").value),
-      taxes: formatCurrency(document.getElementById("taxes").value),
-      closeEscrow: document.getElementById("closeEscrow").value,
-      emd: formatCurrency(document.getElementById("emd").value),
-      yourName: document.getElementById("yourName").value,
-      yourPhone: document.getElementById("yourPhone").value,
-      yourEmail: document.getElementById("yourEmail").value
-    };
-
-    try {
-      const response = await fetch(toneFile);
-      if (!response.ok) throw new Error("Tone file not found: " + toneFile);
-      const toneData = await response.json();
-
-      const body = toneData.sections.map(section => {
-        return section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
-      }).join("<br><br>");
-
-      const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
-      const outputHtml = `<strong>Subject:</strong> ${subject}<br><br>${body}`;
-
-      const outputDiv = document.getElementById("output");
-      outputDiv.innerHTML = outputHtml;
-      document.getElementById("copyBtn").style.display = "inline-block";
-
-    } catch (err) {
-      console.error("Error loading tone file:", err);
-      document.getElementById("output").innerHTML = `<div style="color:red;">Failed to load tone template: ${err.message}</div>`;
+  // 🧠 Recalculate Purchase Price = 68% of Listed Price if offer is cash
+  if (offerType === "cash") {
+    const rawTSV = document.getElementById("tsvInput").value.trim();
+    const tsvValues = rawTSV.split("\t");
+    const listPrice = parseFloat(tsvValues[3] || 0);
+    if (!isNaN(listPrice)) {
+      document.getElementById("purchasePrice").value = (listPrice * 0.68).toFixed(0);
     }
-  });
+  }
+
+  const tone = toneStyleSelect.value;
+  const toneFile = `tones/${offerType}-${tone}.json`;
+
+  const formData = {
+    agent: document.getElementById("agentName").value,
+    address: document.getElementById("propertyAddress").value,
+    price: formatCurrency(document.getElementById("purchasePrice").value),
+    down: formatCurrency(document.getElementById("downPayment").value),
+    monthly: formatCurrency(document.getElementById("monthlyPayment").value),
+    rate: parseFloat(document.getElementById("interestRate").value || 0).toFixed(2) + '%',
+    balloon: document.getElementById("balloonTerm").value + " years",
+    amort: document.getElementById("amortization").value + " years",
+    insurance: formatCurrency(document.getElementById("insurance").value),
+    taxes: formatCurrency(document.getElementById("taxes").value),
+    closeEscrow: document.getElementById("closeEscrow").value,
+    emd: formatCurrency(document.getElementById("emd").value),
+    yourName: document.getElementById("yourName").value,
+    yourPhone: document.getElementById("yourPhone").value,
+    yourEmail: document.getElementById("yourEmail").value
+  };
+
+  try {
+    const response = await fetch(toneFile);
+    if (!response.ok) throw new Error("Tone file not found: " + toneFile);
+    const toneData = await response.json();
+
+    const body = toneData.sections.map(section => {
+      return section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
+    }).join("<br><br>");
+
+    const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
+    const outputHtml = `<strong>Subject:</strong> ${subject}<br><br>${body}`;
+
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = outputHtml;
+    document.getElementById("copyBtn").style.display = "inline-block";
+
+  } catch (err) {
+    console.error("Error loading tone file:", err);
+    document.getElementById("output").innerHTML = `<div style="color:red;">Failed to load tone template: ${err.message}</div>`;
+  }
+});
 
   document.getElementById("copyBtn").addEventListener("click", async function () {
     const htmlContent = document.getElementById("output").innerHTML;
