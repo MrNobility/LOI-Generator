@@ -1,5 +1,4 @@
-if (!window.BulkLOI) window.BulkLOI = {};
-const BulkLOI = window.BulkLOI;
+var BulkLOI = window.BulkLOI;
 
 /**
  * Grabs DOM input values and triggers the bulk LOI generation.
