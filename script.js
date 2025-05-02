@@ -1,6 +1,6 @@
-# Let's write the full script.js with offerType + toneStyle logic and TSV parsing
+# Final corrected version of script.js with tab fix and tone dropdown initialization
 
-script_code = """
+script_fixed = """
 document.addEventListener("DOMContentLoaded", function () {
   const offerToTones = {
     sellerFinance: [
@@ -12,14 +12,13 @@ document.addEventListener("DOMContentLoaded", function () {
     ]
   };
 
-  const toneMap = {}; // Used for reverse-lookup of file paths
-
   const offerTypeSelect = document.getElementById("offerType");
   const toneStyleSelect = document.getElementById("toneStyle");
 
   function populateToneOptions() {
     const offer = offerTypeSelect.value;
     toneStyleSelect.innerHTML = "";
+    if (!offerToTones[offer]) return;
     offerToTones[offer].forEach(tone => {
       const option = document.createElement("option");
       option.value = tone.value;
@@ -29,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   offerTypeSelect.addEventListener("change", populateToneOptions);
-  populateToneOptions(); // initialize on load
+  populateToneOptions(); // populate tones on page load
 
   const fieldMap = {
     1: "propertyAddress",
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("parseBtn").addEventListener("click", function () {
     const raw = document.getElementById("tsvInput").value.trim();
-    const values = raw.split("\t");
+    const values = raw.split("\\t").length === 1 ? raw.split("\t") : raw.split("\\t");
 
     for (const [i, id] of Object.entries(fieldMap)) {
       if (values[i]) {
@@ -134,9 +133,9 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 """
 
-# Save to script.js
-script_path = "/mnt/data/script.js"
+# Save it to a new downloadable script.js file
+script_path = "/mnt/data/fixed-script.js"
 with open(script_path, "w") as f:
-    f.write(script_code)
+    f.write(script_fixed)
 
 script_path
