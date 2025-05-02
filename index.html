@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>LOI Generator</title>
   <link rel="stylesheet" href="style.css">
+  <script src="bulkModule/tsvParser.js"></script>
+<script src="bulkModule/bulkGenerator.js"></script>
+<script src="bulkModule/handleBulkUI.js"></script>
+<script src="main.js"></script> <!-- your existing single-deal code -->
 </head>
 <body>
   <h2>LOI Generator</h2>
@@ -70,6 +74,31 @@
   <textarea id="tsvInput" rows="4"></textarea>
   <button id="parseBtn">Fill Form from TSV</button>
   <button id="generateBtn">Generate LOI</button>
+
+  <div id="bulk-loi-section" style="border:1px solid #ccc; padding:16px; margin-top:20px;">
+  <h2>📦 Bulk LOI Generator</h2>
+  <label for="tsvInput"><strong>Paste TSV Data:</strong></label><br>
+  <textarea id="tsvInput" rows="8" style="width:100%; margin-bottom:10px;"></textarea>
+
+  <div style="margin-bottom:10px;">
+    <label><strong>Default Offer Type:</strong></label>
+    <select id="globalOfferType">
+      <option value="Seller Finance">Seller Finance</option>
+      <option value="Cash">Cash</option>
+    </select>
+
+    <label style="margin-left:20px;"><strong>Default Tone:</strong></label>
+    <select id="globalToneStyle">
+      <option value="professional">Professional</option>
+      <option value="marketReality">Market Reality</option>
+      <option value="friendly">Friendly</option>
+    </select>
+  </div>
+
+  <button onclick="handleBulkGenerate()" style="padding:10px 20px;">🚀 Generate Bulk LOIs</button>
+
+  <div id="bulk-loi-output" style="margin-top:20px;"></div>
+</div>
 
   <div id="output" style="margin-top:30px;"></div>
   <button id="copyBtn" style="display:none;">Copy to Clipboard</button>
