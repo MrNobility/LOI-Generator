@@ -58,7 +58,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const listPrice = parseFloat(values[3] || 0);
     const purchaseField = document.getElementById("purchasePrice");
     const offerType = offerTypeSelect.value;
-
+   
+    if (offerType === "cash") {
+  const listPriceInput = parseFloat(document.getElementById("listedPrice")?.value || 0);
+  if (!isNaN(listPriceInput) && listPriceInput > 0) {
+    document.getElementById("purchasePrice").value = (listPriceInput * 0.68).toFixed(0);
+  }
+}
     if (offerType === "cash" && !purchaseField.value && !isNaN(listPrice)) {
       purchaseField.value = (listPrice * 0.68).toFixed(0);
     }
