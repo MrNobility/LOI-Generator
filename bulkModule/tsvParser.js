@@ -1,4 +1,5 @@
-window.BulkLOI = window.BulkLOI || {};
+if (!window.BulkLOI) window.BulkLOI = {};
+const BulkLOI = window.BulkLOI;
 
 BulkLOI.parseTSVInput = function(tsvText) {
   const lines = tsvText.trim().split('\n').filter(line => line.trim() !== "");
