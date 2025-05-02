@@ -2,22 +2,29 @@ function parseTSVInput(tsvText) {
   const lines = tsvText.trim().split('\n').filter(Boolean);
   const rows = lines.map(line => line.split('\t'));
 
-  const hasHeaders = isNaN(Number(rows[0][1])) === false ? false : true;
-  let headers = hasHeaders ? rows.shift() : null;
+  if (!rows.length) return [];
 
-  const defaultHeaders = [
-    "Full Address", "Purchase Price", "Listed Price", "Down Payment",
-    "Interest Rate", "Monthly Payment (PITI)", "Balloon Term",
-    "Amortization", "Monthly Insurance", "Monthly Taxes", "Close of Escrow",
-    "EMD", "offerType", "toneStyle"
-  ];
+  const headersPresent = rows[0][0]?.toLowerCase().includes("timestamp");
+  if (headersPresent) rows.shift(); // skip header row
 
   return rows.map((row, i) => {
-    const deal = {};
-    (headers || defaultHeaders).forEach((key, index) => {
-      deal[key] = row[index]?.trim() || "";
-    });
-    deal.__rowIndex = i + 1;
+    const deal = {
+      "Full Address": row[1]?.trim(),
+      "Purchase Price": row[2],
+      "Listed Price": row[3],
+      "Down Payment": row[5],
+      "Interest Rate": row[6],
+      "Monthly Payment (PITI)": row[7],
+      "Balloon Term": row[8],
+      "Amortization": row[9],
+      "Monthly Insurance": row[10],
+      "Monthly Taxes": row[11],
+      "Close of Escrow": row[18],
+      "EMD": row[19],
+      "offerType": row[30],     // optional override
+      "toneStyle": row[31],     // optional override
+      "__rowIndex": i + 1
+    };
     return deal;
   });
 }
