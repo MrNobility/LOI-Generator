@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function populateToneOptions() {
     const offer = offerTypeSelect.value;
     toneStyleSelect.innerHTML = "";
+
     if (!offerToTones[offer]) return;
 
     offerToTones[offer].forEach(tone => {
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   offerTypeSelect.addEventListener("change", populateToneOptions);
-  populateToneOptions(); // Run once at load
+  populateToneOptions(); // run once on load
 
   const fieldMap = {
     1: "propertyAddress",
@@ -96,6 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       const response = await fetch(toneFile);
+      if (!response.ok) throw new Error("Tone file not found: " + toneFile);
       const toneData = await response.json();
 
       const body = toneData.sections.map(section => {
@@ -111,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (err) {
       console.error("Error loading tone file:", err);
-      document.getElementById("output").innerHTML = "Failed to load tone template.";
+      document.getElementById("output").innerHTML = `<div style="color:red;">Failed to load tone template: ${err.message}</div>`;
     }
   });
 
