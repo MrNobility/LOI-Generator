@@ -1,4 +1,4 @@
-const BulkLOI = window.BulkLOI || (window.BulkLOI = {});
+window.BulkLOI = window.BulkLOI || {};
 
 /**
  * Grabs DOM input values and triggers the bulk LOI generation.
