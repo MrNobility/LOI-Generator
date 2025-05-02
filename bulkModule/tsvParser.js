@@ -8,6 +8,10 @@ BulkLOI.parseTSVInput = function(tsvText) {
   const lines = cleanedText.trim().split('\n').filter(line => line.trim() !== "");
   const rows = lines.map(line => line.split('\t'));
 
+console.log("CLEANED TEXT:", JSON.stringify(cleanedText));
+console.log("ROWS:", rows);
+
+  
   if (!rows.length || rows[0].length < 2) {
     console.error("TSV data is empty or malformed. Raw rows:", rows);
     return [];
