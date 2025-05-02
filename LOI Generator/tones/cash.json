@@ -1,0 +1,12 @@
+{
+  "subject": "All Cash Offer for {{address}}",
+  "sections": [
+    "Good Day {{agent}},\n\nThank you for reviewing our all-cash offer to purchase:\n\n<strong>{{address}}</strong>",
+    "We\u2019re prepared to move quickly and close without delays, financing hurdles, or complications. This is a straightforward deal designed to create certainty and speed for all parties involved.",
+    "<strong>Offer Summary:</strong><br><strong>Purchase Price:</strong> {{price}}<br><strong>Close of Escrow:</strong> {{closeEscrow}}<br><strong>Earnest Money Deposit (EMD):</strong> {{emd}} \u2014 submitted upon acceptance and post-inspection",
+    "This offer is presented \u201cas-is\u201d and is designed to minimize back-and-forth. We\u2019re experienced buyers with the ability to close fast and clean, and we\u2019re ready to begin due diligence immediately.",
+    "If your seller has any questions or would like to counter, we\u2019re happy to have a quick conversation to align on a win-win outcome.",
+    "Warm regards,<br><strong>{{yourName}}</strong><br>{{yourPhone}}<br><a href=\"mailto:{{yourEmail}}\">{{yourEmail}}</a>",
+    "<p style=\"font-size:12px; color:gray;\">This Letter of Intent is non-binding and subject to execution of a formal Purchase Agreement.</p>"
+  ]
+}
