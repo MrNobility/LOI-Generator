@@ -1,3 +1,4 @@
+window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
 BulkLOI.parseTSVInput = function(tsvText) {
