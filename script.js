@@ -88,16 +88,16 @@ document.addEventListener("DOMContentLoaded", function () {
 document.getElementById("generateBtn").addEventListener("click", async function () {
   const offerType = offerTypeSelect.value;
 
-  // 🧠 Recalculate Purchase Price = 68% of Listed Price if offer is cash
-  let calcPrice = document.getElementById("purchasePrice").value; // fallback
+  // Step 1: Pre-calculate the correct purchase price for Cash
+  let calcPrice = parseFloat(document.getElementById("purchasePrice").value || 0);
 
   if (offerType === "cash") {
     const rawTSV = document.getElementById("tsvInput").value.trim();
     const tsvValues = rawTSV.split("\t");
-    const listPrice = parseFloat(tsvValues[4] || 0); // List Price = TSV column 5
-    if (!isNaN(listPrice)) {
-      calcPrice = (listPrice * 0.68).toFixed(0);
-      document.getElementById("purchasePrice").value = calcPrice;
+    const listPrice = parseFloat(tsvValues[4] || 0); // column 5 = list price
+    if (!isNaN(listPrice) && listPrice > 0) {
+      calcPrice = listPrice * 0.68;
+      document.getElementById("purchasePrice").value = calcPrice.toFixed(0);
     }
   }
 
