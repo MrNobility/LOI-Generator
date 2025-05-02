@@ -1,5 +1,4 @@
-if (!window.BulkLOI) window.BulkLOI = {};
-const BulkLOI = window.BulkLOI;
+var BulkLOI = window.BulkLOI;
 
 /**
  * Generates and displays LOIs for each parsed deal.
