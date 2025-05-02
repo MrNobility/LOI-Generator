@@ -1,5 +1,4 @@
-if (!window.BulkLOI) window.BulkLOI = {};
-const BulkLOI = window.BulkLOI;
+var BulkLOI = window.BulkLOI;
 
 BulkLOI.parseTSVInput = function(tsvText) {
   console.log("Raw TSV text:", JSON.stringify(tsvText));  // See what's being passed
