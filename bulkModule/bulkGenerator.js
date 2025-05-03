@@ -13,8 +13,8 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneSty
   for (let index = 0; index < deals.length; index++) {
     const deal = deals[index];
 
-    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", globalToneStyle, toneTemplates);
-    const cashLOI = generateLOI(deal, "cash", globalToneStyle, toneTemplates);
+    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", normalizeTone(deal.toneStyle || globalToneStyle), toneTemplates);
+    const cashLOI = generateLOI(deal, "cash", normalizeTone(deal.toneStyle || globalToneStyle), toneTemplates);
 
     const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
     const container = document.createElement("div");
@@ -80,6 +80,17 @@ function formatCurrency(value) {
     style: "currency",
     currency: "USD"
   }).format(num);
+}
+
+function normalizeTone(input) {
+  const map = {
+    "Seller Finance Acquisitions": "professional",
+    "Market Reality": "marketReality",
+    "Professional": "professional",
+    "professional": "professional",
+    "marketReality": "marketReality"
+  };
+  return map[input] || "professional";
 }
 
 async function preloadTones() {
