@@ -1,4 +1,6 @@
-// script.js
+// ✅ Updated script.js
+
+// Handles SINGLE deal generation UI and output logic
 
 document.addEventListener("DOMContentLoaded", function () {
   const offerToTones = {
@@ -80,24 +82,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("generateBtn").addEventListener("click", async function () {
     const offerType = offerTypeSelect.value;
-
-    let calcPrice = parseFloat(document.getElementById("purchasePrice").value || 0);
-
-    if (offerType === "cash") {
-      const listPrice = parseFloat(document.getElementById("listedPrice").value || 0);
-      if (!isNaN(listPrice) && listPrice > 0) {
-        calcPrice = listPrice * 0.68;
-        document.getElementById("purchasePrice").value = calcPrice.toFixed(0);
-      }
-    }
-
     const tone = toneStyleSelect.value;
-    const toneFile = `tones/${offerType}-${tone}.json`;
+
+    const calcPurchasePrice = (() => {
+      const entered = parseFloat(document.getElementById("purchasePrice").value || 0);
+      const listed = parseFloat(document.getElementById("listedPrice").value || 0);
+      if (offerType === "cash" && listed > 0) return listed * 0.68;
+      return entered;
+    })();
 
     const formData = {
       agent: document.getElementById("agentName").value,
       address: document.getElementById("propertyAddress").value,
-      price: formatCurrency(calcPrice),
+      price: formatCurrency(calcPurchasePrice),
       down: formatCurrency(document.getElementById("downPayment").value),
       monthly: formatCurrency(document.getElementById("monthlyPayment").value),
       rate: parseFloat(document.getElementById("interestRate").value || 0).toFixed(2) + '%',
@@ -112,37 +109,47 @@ document.addEventListener("DOMContentLoaded", function () {
       yourEmail: document.getElementById("yourEmail").value
     };
 
+    const toneFile = `tones/${offerType}-${tone}.json`;
+
     try {
       const response = await fetch(toneFile);
       if (!response.ok) throw new Error("Tone file not found: " + toneFile);
       const toneData = await response.json();
 
-      const body = toneData.sections.map(section => {
-        return section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
-      }).join("<br><br>");
+      const outputContainer = document.getElementById("output");
+      outputContainer.innerHTML = "";
 
+      const card = document.createElement("div");
+      card.className = "loi-card";
+
+      const content = document.createElement("div");
+      content.className = "loi-content";
+      const filled = toneData.sections.map(section =>
+        section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '')
+      ).join("<br><br>");
       const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || '');
-      const outputHtml = `<strong>Subject:</strong> ${subject}<br><br>${body}`;
 
-      document.getElementById("output").innerHTML = outputHtml;
-      document.getElementById("copyBtn").style.display = "inline-block";
+      content.innerHTML = `<strong>Subject:</strong> ${subject}<br><br>${filled}`;
+
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
+      copyBtn.textContent = "Copy to Clipboard";
+      copyBtn.addEventListener("click", async () => {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/html": new Blob([content.innerHTML], { type: "text/html" })
+          })
+        ]);
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => (copyBtn.textContent = "Copy to Clipboard"), 1500);
+      });
+
+      card.appendChild(content);
+      card.appendChild(copyBtn);
+      outputContainer.appendChild(card);
     } catch (err) {
       console.error("Error loading tone file:", err);
       document.getElementById("output").innerHTML = `<div style="color:red;">Failed to load tone template: ${err.message}</div>`;
-    }
-  });
-
-  document.getElementById("copyBtn").addEventListener("click", async function () {
-    const htmlContent = document.getElementById("output").innerHTML;
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          "text/html": new Blob([htmlContent], { type: "text/html" })
-        })
-      ]);
-      document.getElementById("copyMessage").style.display = "block";
-    } catch (err) {
-      alert("Copy failed. Please use a supported browser like Chrome or Edge.");
     }
   });
 });
