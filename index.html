@@ -86,25 +86,25 @@
     <button id="copyBtn" style="display:none;">Copy to Clipboard</button>
     <div id="copyMessage" style="color:green; font-weight:bold; display:none;">Copied to clipboard ✅</div>
   </div>
-
+  
   <!-- 🔸 BULK LOI GENERATOR -->
-  <div id="bulk-loi-section" style="border:2px dashed #888; padding:20px;">
-    <h2>📦 Bulk LOI Generator</h2>
+<div id="bulk-loi-section" style="border:2px dashed #888; padding:20px;">
+  <h2>📦 Bulk LOI Generator</h2>
 
-    <label for="tsvInput"><strong>Paste MULTIPLE Deal Rows (TSV):</strong></label><br />
-    <textarea id="tsvInput" rows="6" style="width:100%; margin-bottom:10px;"></textarea>
+  <label for="tsvInput"><strong>Paste MULTIPLE Deal Rows (TSV):</strong></label><br />
+  <textarea id="tsvInput" rows="6" style="width:100%; margin-bottom:10px;"></textarea>
 
-    <label style="margin-left:20px;"><strong>Default Tone:</strong></label>
-    <select id="globalToneStyle">
-      <option value="professional">Professional</option>
-      <option value="marketReality">Market Reality</option>
-      <option value="friendly">Friendly</option>
-    </select>
+  <label style="margin-left:20px;"><strong>Default Tone:</strong></label>
+  <select id="globalToneStyle">
+    <option value="professional">Professional</option>
+    <option value="marketReality">Market Reality</option>
+    <option value="friendly">Friendly</option>
+  </select>
 
-    <button onclick="BulkLOI.handleBulkGenerate()" style="padding:10px 20px; margin-top:10px;">🚀 Generate Bulk LOIs</button>
+  <button onclick="BulkLOI.handleBulkGenerate()" style="padding:10px 20px; margin-top:10px;">🚀 Generate Bulk LOIs</button>
 
-    <div id="bulk-loi-output" style="margin-top:20px;"></div>
-  </div>
+  <div id="bulk-loi-output" style="margin-top:20px;"></div>
+</div>
 
   <!-- 🔁 Scripts (Versioned to Bust Cache) -->
   <script src="bulkModule/tsvParser.js?v=1.0.6"></script>
