@@ -3,6 +3,7 @@
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
+// Generates full persuasive LOIs and inserts them into the DOM per deal
 BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneStyle) {
   const outputContainer = document.getElementById("bulk-loi-output");
   outputContainer.innerHTML = "Loading...";
@@ -13,8 +14,8 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneSty
   for (let index = 0; index < deals.length; index++) {
     const deal = deals[index];
 
-    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", normalizeTone(deal.toneStyle || globalToneStyle), toneTemplates);
-    const cashLOI = generateLOI(deal, "cash", normalizeTone(deal.toneStyle || globalToneStyle), toneTemplates);
+    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", globalToneStyle, toneTemplates);
+    const cashLOI = generateLOI(deal, "cash", globalToneStyle, toneTemplates);
 
     const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
     const container = document.createElement("div");
@@ -109,8 +110,13 @@ async function preloadTones() {
 }
 
 function generateLOI(deal, offerType, tone, toneTemplates) {
-  const toneData = toneTemplates[`${offerType}-${tone}`];
-  if (!toneData) return `<p style='color:red;'>Missing tone: ${offerType}-${tone}</p>`;
+  const key = `${offerType}-${normalizeTone(tone)}`;
+  const toneData = toneTemplates[key];
+
+  if (!toneData || !Array.isArray(toneData.sections)) {
+    console.error("Missing or invalid tone template:", key);
+    return `<p style='color:red;'>Template not found: ${key}</p>`;
+  }
 
   const formData = {
     agent: deal.agent || "",
@@ -125,16 +131,16 @@ function generateLOI(deal, offerType, tone, toneTemplates) {
     taxes: formatCurrency(deal["Monthly Taxes"]),
     closeEscrow: deal["Close of Escrow"] || "",
     emd: formatCurrency(deal["EMD"]),
-    yourName: deal.yourName || "",
-    yourPhone: deal.yourPhone || "",
-    yourEmail: deal.yourEmail || ""
+    yourName: deal.yourName || "Dalton Eddleman",
+    yourPhone: deal.yourPhone || "512-265-5448",
+    yourEmail: deal.yourEmail || "Mr.Nobility@nobility.network"
   };
 
-  const body = toneData.sections.map(section =>
+  const filledSections = toneData.sections.map(section =>
     section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "")
   ).join("<br><br>");
 
   const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "");
 
-  return `<strong>Subject:</strong> ${subject}<br><br>${body}`;
+  return `<strong>Subject:</strong> ${subject}<br><br>${filledSections}`;
 }
