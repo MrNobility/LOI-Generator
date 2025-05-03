@@ -17,5 +17,6 @@ BulkLOI.handleBulkGenerate = function () {
     return;
   }
 
+  // No more offer type — we always generate both
   BulkLOI.bulkGenerateLOIs(deals, globalToneStyle);
 };
