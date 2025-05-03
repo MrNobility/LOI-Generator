@@ -11,11 +11,18 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneSty
   for (let index = 0; index < deals.length; index++) {
     const deal = deals[index];
 
-    const actualOfferType = deal.offerType || globalOfferType;
     const actualToneStyle = deal.toneStyle || globalToneStyle;
 
     const sellerFinanceLOI = generateLOI(deal, "sellerFinance", actualToneStyle, toneTemplates);
-    const cashLOI = generateLOI(deal, "cash", actualToneStyle, toneTemplates);
+
+    // Fallback: force 'professional' tone for cash if no specific one exists
+    let cashTone = actualToneStyle;
+    const cashKey = `cash-${normalizeTone(cashTone)}`;
+    if (!toneTemplates[cashKey]) {
+    cashTone = "professional";
+}
+
+    const cashLOI = generateLOI(deal, "cash", cashTone, toneTemplates);
 
 
     const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
