@@ -17,9 +17,13 @@ BulkLOI.bulkGenerateLOIs = function(deals, globalOfferType, globalToneStyle) {
     const cashLOI = generateLOI({ ...deal, offerType: "Cash", toneStyle });
 
     const dealOutput = document.createElement('details');
+    dealOutput.className = "loi-card";
     dealOutput.open = true;
+
+    const address = deal["Full Address"] || `Deal #${index + 1}`;
+
     dealOutput.innerHTML = `
-      <summary><strong>${deal["Full Address"] || `Deal #${index + 1}`}</strong></summary>
+      <summary><strong>${address}</strong></summary>
       <div class="loi-block">
         <h4>Seller Finance</h4>
         <div class="loi-content">${sellerFinanceLOI}</div>
@@ -27,6 +31,7 @@ BulkLOI.bulkGenerateLOIs = function(deals, globalOfferType, globalToneStyle) {
         <div class="loi-content">${cashLOI}</div>
       </div>
     `;
+
     outputContainer.appendChild(dealOutput);
   });
 };
