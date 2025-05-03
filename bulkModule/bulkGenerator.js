@@ -118,10 +118,19 @@ function generateLOI(deal, offerType, tone, toneTemplates) {
     return `<p style='color:red;'>Template not found: ${key}</p>`;
   }
 
+  // Calculate the correct purchase price for cash offers
+  let purchasePrice = deal["Purchase Price"];
+  if (offerType === "cash" && deal["Listed Price"]) {
+    const listedPrice = parseFloat(deal["Listed Price"]);
+    if (!isNaN(listedPrice)) {
+      purchasePrice = (listedPrice * 0.68).toFixed(2); // round to 2 decimals
+    }
+  }
+
   const formData = {
     agent: deal.agent || "",
     address: deal["Full Address"] || "",
-    price: formatCurrency(deal["Purchase Price"]),
+    price: formatCurrency(purchasePrice),
     down: formatCurrency(deal["Down Payment"]),
     monthly: formatCurrency(deal["Monthly Payment (PITI)"]),
     rate: deal["Interest Rate"] ? parseFloat(deal["Interest Rate"]).toFixed(2) + "%" : "",
