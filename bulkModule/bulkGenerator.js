@@ -1,7 +1,7 @@
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
-BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneStyle) {
+BulkLOI.bulkGenerateLOIs = async function (deals, globalToneStyle) {
   const outputContainer = document.getElementById("bulk-loi-output");
   outputContainer.innerHTML = "Loading...";
 
@@ -15,15 +15,14 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneSty
 
     const sellerFinanceLOI = generateLOI(deal, "sellerFinance", actualToneStyle, toneTemplates);
 
-    // Fallback: force 'professional' tone for cash if no specific one exists
+    // Fallback tone for cash if selected tone doesn't exist
     let cashTone = actualToneStyle;
     const cashKey = `cash-${normalizeTone(cashTone)}`;
     if (!toneTemplates[cashKey]) {
-    cashTone = "professional";
-}
+      cashTone = "professional";
+    }
 
     const cashLOI = generateLOI(deal, "cash", cashTone, toneTemplates);
-
 
     const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
     const container = document.createElement("div");
@@ -114,55 +113,12 @@ async function preloadTones() {
   const tones = {};
   for (const { offerType, tone } of toneFiles) {
     const key = `${offerType}-${tone}`;
-    const res = await fetch(`tones/${key}.json`);
-    tones[key] = await res.json();
-  }
-  return tones;
-}
-
-function generateLOI(deal, offerType, tone, toneTemplates) {
-  const key = `${offerType}-${normalizeTone(tone)}`;
-  const toneData = toneTemplates[key];
-
-  if (!toneData || !Array.isArray(toneData.sections)) {
-    console.error("Missing or invalid tone template:", key);
-    return `<p style='color:red;'>Template not found: ${key}</p>`;
-  }
-
-  // Calculate 68% of listed price if it's a cash offer
-  let purchasePrice = deal["Purchase Price"];
-  if (offerType === "cash") {
-    const listedPrice = parseFloat(deal["Listed Price"]);
-    if (!isNaN(listedPrice)) {
-      purchasePrice = (listedPrice * 0.68).toFixed(2);
-    } else {
-      console.warn(`Invalid listed price on deal row ${deal["__rowIndex"]}`);
+    try {
+      const res = await fetch(`tones/${key}.json`);
+      tones[key] = await res.json();
+    } catch (err) {
+      console.warn(`Tone template not found: ${key}`);
     }
   }
-
-  const formData = {
-    agent: deal.agent || "",
-    address: deal["Full Address"] || "",
-    price: formatCurrency(purchasePrice),
-    down: formatCurrency(deal["Down Payment"]),
-    monthly: formatCurrency(deal["Monthly Payment (PITI)"]),
-    rate: deal["Interest Rate"] ? parseFloat(deal["Interest Rate"]).toFixed(2) + "%" : "",
-    balloon: deal["Balloon Term"] ? deal["Balloon Term"] + " years" : "",
-    amort: deal["Amortization"] ? deal["Amortization"] + " years" : "",
-    insurance: formatCurrency(deal["Monthly Insurance"]),
-    taxes: formatCurrency(deal["Monthly Taxes"]),
-    closeEscrow: deal["Close of Escrow"] || "",
-    emd: formatCurrency(deal["EMD"]),
-    yourName: deal.yourName || "Dalton Eddleman",
-    yourPhone: deal.yourPhone || "512-265-5448",
-    yourEmail: deal.yourEmail || "Mr.Nobility@nobility.network"
-  };
-
-  const filledSections = toneData.sections.map(section =>
-    section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "")
-  ).join("<br><br>");
-
-  const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "");
-
-  return `<strong>Subject:</strong> ${subject}<br><br>${filledSections}`;
+  return tones;
 }
