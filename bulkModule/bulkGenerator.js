@@ -1,3 +1,5 @@
+// ✅ Updated bulkGenerator.js
+
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
@@ -11,8 +13,11 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneSty
   for (let index = 0; index < deals.length; index++) {
     const deal = deals[index];
 
-    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", globalToneStyle, toneTemplates);
-    const cashLOI = generateLOI(deal, "cash", globalToneStyle, toneTemplates);
+    const dealOfferType = deal.offerType || globalOfferType;
+    const dealToneStyle = deal.toneStyle || globalToneStyle;
+
+    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", dealToneStyle, toneTemplates);
+    const cashLOI = generateLOI(deal, "cash", dealToneStyle, toneTemplates);
 
     const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
     const container = document.createElement("div");
@@ -118,10 +123,18 @@ function generateLOI(deal, offerType, tone, toneTemplates) {
     return `<p style='color:red;'>Template not found: ${key}</p>`;
   }
 
+  const purchasePrice = (() => {
+    if (offerType === "cash" && deal["Listed Price"]) {
+      const listed = parseFloat(deal["Listed Price"]);
+      return isNaN(listed) ? "" : formatCurrency(listed * 0.68);
+    }
+    return formatCurrency(deal["Purchase Price"]);
+  })();
+
   const formData = {
     agent: deal.agent || "",
     address: deal["Full Address"] || "",
-    price: formatCurrency(deal["Purchase Price"]),
+    price: purchasePrice,
     down: formatCurrency(deal["Down Payment"]),
     monthly: formatCurrency(deal["Monthly Payment (PITI)"]),
     rate: deal["Interest Rate"] ? parseFloat(deal["Interest Rate"]).toFixed(2) + "%" : "",
