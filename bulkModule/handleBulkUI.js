@@ -1,4 +1,4 @@
-// handleBulkUI.js
+// ✅ Updated handleBulkUI.js
 
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
@@ -9,11 +9,13 @@ var BulkLOI = window.BulkLOI;
 BulkLOI.handleBulkGenerate = function () {
   const tsvText = document.getElementById('tsvInput')?.value || "";
 
-  const globalOfferType = (document.getElementById('globalOfferType')?.value || "Seller Finance")
-    .toLowerCase()
-    .replace(/\s/g, ''); // Converts "Seller Finance" => "sellerFinance"
+  const globalOfferType = normalizeOfferType(
+    document.getElementById('globalOfferType')?.value || "Seller Finance"
+  );
 
-  const globalToneStyle = document.getElementById('globalToneStyle')?.value || "professional";
+  const globalToneStyle = normalizeTone(
+    document.getElementById('globalToneStyle')?.value || "professional"
+  );
 
   const deals = BulkLOI.parseTSVInput(tsvText);
 
@@ -24,3 +26,24 @@ BulkLOI.handleBulkGenerate = function () {
 
   BulkLOI.bulkGenerateLOIs(deals, globalOfferType, globalToneStyle);
 };
+
+function normalizeTone(input) {
+  const map = {
+    "Seller Finance Acquisitions": "professional",
+    "Market Reality": "marketReality",
+    "Professional": "professional",
+    "professional": "professional",
+    "marketReality": "marketReality",
+    "": "professional",
+    null: "professional",
+    undefined: "professional"
+  };
+  return map[input?.trim()] || "professional";
+}
+
+function normalizeOfferType(input) {
+  if (!input) return "sellerFinance";
+  const normalized = input.trim().toLowerCase();
+  if (normalized.includes("cash")) return "cash";
+  return "sellerFinance";
+} 
