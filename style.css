@@ -75,4 +75,30 @@ body {
     font-weight: bold;
     display: none;
   }
-  
+  .loi-card {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #fdfdfd;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.loi-block {
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+  margin-top: 10px;
+}
+
+.loi-block h4 {
+  margin: 10px 0 5px;
+  font-size: 16px;
+}
+
+.loi-content {
+  padding: 10px;
+  background-color: #fafafa;
+  border: 1px dashed #aaa;
+  white-space: pre-wrap;
+  font-family: 'Courier New', monospace;
+}
