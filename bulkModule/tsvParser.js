@@ -1,3 +1,5 @@
+// ✅ Updated tsvParser.js
+
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
@@ -30,8 +32,8 @@ BulkLOI.parseTSVInput = function(tsvText) {
       "Monthly Taxes": row[11],
       "Close of Escrow": row[18],
       "EMD": row[19],
-      "offerType": row[30]?.trim().toLowerCase().includes("cash") ? "cash" : "sellerFinance",
-      "toneStyle": normalizeTone(row[31]?.trim()),
+      "offerType": normalizeOfferType(row[30]),
+      "toneStyle": normalizeTone(row[31]),
       "yourName": "Dalton Eddleman",
       "yourPhone": "512-265-5448",
       "yourEmail": "Mr.Nobility@nobility.network",
@@ -41,7 +43,6 @@ BulkLOI.parseTSVInput = function(tsvText) {
   });
 };
 
-// Map human-readable tone names to internal keys
 function normalizeTone(input) {
   const map = {
     "Seller Finance Acquisitions": "professional",
@@ -53,5 +54,12 @@ function normalizeTone(input) {
     null: "professional",
     undefined: "professional"
   };
-  return map[input] || "professional";
+  return map[input?.trim()] || "professional";
 }
+
+function normalizeOfferType(input) {
+  if (!input) return "sellerFinance";
+  const normalized = input.trim().toLowerCase();
+  if (normalized.includes("cash")) return "cash";
+  return "sellerFinance";
+} 
