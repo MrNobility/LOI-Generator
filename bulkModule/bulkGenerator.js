@@ -51,8 +51,54 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalToneStyle) {
     outputContainer.appendChild(container);
   }
 };
+function generateLOI(deal, offerType, tone, toneTemplates) {
+  const key = `${offerType}-${normalizeTone(tone)}`;
+  const toneData = toneTemplates[key];
 
-function createOfferBlock(title, htmlContent) {
+  if (!toneData || !Array.isArray(toneData.sections)) {
+    console.error("Missing or invalid tone template:", key);
+    return `<p style='color:red;'>Template not found: ${key}</p>`;
+  }
+
+  // Determine the correct purchase price
+  let purchasePrice = deal["Purchase Price"];
+  if (offerType === "cash") {
+    const listed = parseFloat(deal["Listed Price"]);
+    if (!isNaN(listed)) {
+      purchasePrice = (listed * 0.68).toFixed(2);
+    } else {
+      console.warn(`Cash offer missing valid Listed Price on deal row ${deal.__rowIndex}`);
+    }
+  }
+
+  const formData = {
+    agent: deal.agent || "",
+    address: deal["Full Address"] || "",
+    price: formatCurrency(purchasePrice),
+    down: formatCurrency(deal["Down Payment"]),
+    monthly: formatCurrency(deal["Monthly Payment (PITI)"]),
+    rate: deal["Interest Rate"] ? parseFloat(deal["Interest Rate"]).toFixed(2) + "%" : "",
+    balloon: deal["Balloon Term"] ? deal["Balloon Term"] + " years" : "",
+    amort: deal["Amortization"] ? deal["Amortization"] + " years" : "",
+    insurance: formatCurrency(deal["Monthly Insurance"]),
+    taxes: formatCurrency(deal["Monthly Taxes"]),
+    closeEscrow: deal["Close of Escrow"] || "",
+    emd: formatCurrency(deal["EMD"]),
+    yourName: deal.yourName || "Dalton Eddleman",
+    yourPhone: deal.yourPhone || "512-265-5448",
+    yourEmail: deal.yourEmail || "Mr.Nobility@nobility.network"
+  };
+
+  const filledSections = toneData.sections.map(section =>
+    section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "")
+  ).join("<br><br>");
+
+  const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "");
+
+  return `<strong>Subject:</strong> ${subject}<br><br>${filledSections}`;
+}
+
+  function createOfferBlock(title, htmlContent) {
   const block = document.createElement("div");
   block.className = "mb-6 p-4 border-l-4 rounded bg-gray-50";
 
