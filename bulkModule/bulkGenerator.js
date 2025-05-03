@@ -118,12 +118,14 @@ function generateLOI(deal, offerType, tone, toneTemplates) {
     return `<p style='color:red;'>Template not found: ${key}</p>`;
   }
 
-  // Calculate the correct purchase price for cash offers
+  // Calculate 68% of listed price if it's a cash offer
   let purchasePrice = deal["Purchase Price"];
-  if (offerType === "cash" && deal["Listed Price"]) {
+  if (offerType === "cash") {
     const listedPrice = parseFloat(deal["Listed Price"]);
     if (!isNaN(listedPrice)) {
-      purchasePrice = (listedPrice * 0.68).toFixed(2); // round to 2 decimals
+      purchasePrice = (listedPrice * 0.68).toFixed(2);
+    } else {
+      console.warn(`Invalid listed price on deal row ${deal["__rowIndex"]}`);
     }
   }
 
