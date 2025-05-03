@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LOI Generator</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;">🏡 Nobility LOI Generator</h1>
+
+  <!-- 🔹 SINGLE DEAL LOI GENERATOR -->
+  <div id="single-loi-section" style="border:1px solid #ccc; padding:20px; margin-bottom:30px;">
+    <h2>📝 Single Deal Generator</h2>
+
+    <label>Offer Type</label>
+    <select id="offer-type">
+      <option value="sellerFinance">Seller Finance</option>
+      <option value="cash">Cash</option>
+    </select>
+
+    <label>Tone Style</label>
+    <select id="tone-style"></select>
+
+    <label>Agent Name</label>
+    <input type="text" id="agentName" />
+
+    <label>Property Address</label>
+    <input type="text" id="propertyAddress" />
+
+    <label>Purchase Price ($)</label>
+    <input type="number" id="purchasePrice" />
+
+    <label>Listed Price ($)</label>
+    <input type="number" id="listedPrice" />
+
+    <label>Down Payment ($)</label>
+    <input type="number" id="downPayment" />
+
+    <label>Monthly Payment (PITI) ($)</label>
+    <input type="number" id="monthlyPayment" />
+
+    <label>Interest Rate (%)</label>
+    <input type="number" id="interestRate" step="0.01" />
+
+    <label>Balloon Term (years)</label>
+    <input type="number" id="balloonTerm" />
+
+    <label>Amortization (years)</label>
+    <input type="number" id="amortization" value="30" />
+
+    <label>Monthly Insurance ($)</label>
+    <input type="number" id="insurance" />
+
+    <label>Monthly Property Taxes ($)</label>
+    <input type="number" id="taxes" />
+
+    <label>Close of Escrow</label>
+    <input type="text" id="closeEscrow" />
+
+    <label>Earnest Money Deposit (EMD)</label>
+    <input type="number" id="emd" />
+
+    <label>Your Name</label>
+    <input type="text" id="yourName" value="Dalton Eddleman" />
+
+    <label>Your Phone</label>
+    <input type="text" id="yourPhone" value="512-265-5448" />
+
+    <label>Your Email</label>
+    <input type="text" id="yourEmail" value="Mr.Nobility@nobility.network" />
+
+    <hr />
+
+    <label for="tsvRowInput"><strong>Paste Deal Row (TSV):</strong></label><br />
+    <textarea id="tsvRowInput" rows="2" style="width:100%; margin-bottom:10px;"></textarea><br />
+    <button id="parseBtn">Fill Form from TSV</button>
+    <button id="generate-single-btn">Generate LOI</button>
+
+    <div id="output" style="margin-top:20px;"></div>
+    <button id="copyBtn" style="display:none;">Copy to Clipboard</button>
+    <div id="copyMessage" style="color:green; font-weight:bold; display:none;">Copied to clipboard ✅</div>
+  </div>
+
+  <!-- 🔸 BULK LOI GENERATOR -->
+  <div id="bulk-loi-section" style="border:2px dashed #888; padding:20px;">
+    <h2>📦 Bulk LOI Generator</h2>
+
+    <label for="tsvInput"><strong>Paste MULTIPLE Deal Rows (TSV):</strong></label><br />
+    <textarea id="tsvInput" rows="6" style="width:100%; margin-bottom:10px;"></textarea>
+
+    <label style="margin-left:20px;"><strong>Default Tone:</strong></label>
+    <select id="globalToneStyle">
+      <option value="professional">Professional</option>
+      <option value="marketReality">Market Reality</option>
+      <option value="friendly">Friendly</option>
+    </select>
+
+    <button onclick="BulkLOI.handleBulkGenerate()" style="padding:10px 20px; margin-top:10px;">🚀 Generate Bulk LOIs</button>
+
+    <div id="bulk-loi-output" style="margin-top:20px;"></div>
+  </div>
+
+  <!-- 🔁 Scripts (Versioned to Bust Cache) -->
+  <script src="bulkModule/tsvParser.js?v=1.0.6"></script>
+  <script src="bulkModule/bulkGenerator.js?v=1.0.6"></script>
+  <script src="bulkModule/handleBulkUI.js?v=1.0.6"></script>
+  <script src="script.js?v=1.0.6"></script>
+</body>
+</html>
