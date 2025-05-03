@@ -2,7 +2,7 @@ window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
 BulkLOI.parseTSVInput = function(tsvText) {
-  const cleanedText = tsvText.replace(/^﻿/, '');
+  const cleanedText = tsvText.replace(/^\ufeff/, '');
   const lines = cleanedText.trim().split('\n').filter(line => line.trim() !== "");
   const rows = lines.map(line => line.split('\t'));
 
@@ -18,8 +18,8 @@ BulkLOI.parseTSVInput = function(tsvText) {
     return {
       "TimeStamp": row[0],
       "Full Address": row[1]?.trim(),
-      "Purchase Price": row[2],
-      "Listed Price": row[3],
+      "Purchase Price": parseFloat(row[2]),
+      "Listed Price": parseFloat(row[3]),
       "% of List Price": row[4],
       "Down Payment": row[5],
       "Interest Rate": row[6],
