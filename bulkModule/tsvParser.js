@@ -2,7 +2,7 @@ window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
 BulkLOI.parseTSVInput = function(tsvText) {
-  const cleanedText = tsvText.replace(/^\uFEFF/, '');
+  const cleanedText = tsvText.replace(/^﻿/, '');
   const lines = cleanedText.trim().split('\n').filter(line => line.trim() !== "");
   const rows = lines.map(line => line.split('\t'));
 
@@ -32,6 +32,10 @@ BulkLOI.parseTSVInput = function(tsvText) {
       "EMD": row[19],
       "offerType": row[30]?.trim().toLowerCase().includes("cash") ? "cash" : "sellerFinance",
       "toneStyle": normalizeTone(row[31]?.trim()),
+      "yourName": "Dalton Eddleman",
+      "yourPhone": "512-265-5448",
+      "yourEmail": "Mr.Nobility@nobility.network",
+      "agent": "",
       "__rowIndex": i + 1
     };
   });
