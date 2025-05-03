@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
   const offerToTones = {
     sellerFinance: [
@@ -47,7 +46,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("parseBtn").addEventListener("click", function () {
     const raw = document.getElementById("tsvRowInput").value.trim();
-    const values = raw.split("\t").length === 1 ? raw.split("\t") : raw.split("\t");
+    const values = raw.split("\t");
+
+    if (values.length < 20) {
+      alert("⚠️ This TSV row looks incomplete. Please double-check your input.");
+      return;
+    }
 
     for (const [i, id] of Object.entries(fieldMap)) {
       if (values[i]) {
@@ -140,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
 window.generateLOI = function(data) {
   return `
     <div>
