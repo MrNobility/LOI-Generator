@@ -45,10 +45,28 @@ document.addEventListener("DOMContentLoaded", function () {
     19: "emd"
   };
 
-  document.getElementById("parseBtn").addEventListener("click", function () {
-    const tsv = document.getElementById("tsvRowInput")?.value || document.getElementById("tsvInput")?.value || "";
-    const values = raw.split("\t").length === 1 ? raw.split("\t") : raw.split("\t");
+ document.getElementById("parseBtn").addEventListener("click", function () {
+  const tsv = document.getElementById("tsvRowInput").value; // ✅ this now references the correct single-deal textarea
+  const fields = tsv.split("\t");
 
+  if (fields.length < 20) {
+    alert("⚠️ This TSV row looks incomplete. Please double-check your input.");
+    return;
+  }
+
+  document.getElementById("propertyAddress").value = fields[1];
+  document.getElementById("purchasePrice").value = fields[2];
+  document.getElementById("listedPrice").value = fields[3];
+  document.getElementById("downPayment").value = fields[5];
+  document.getElementById("interestRate").value = fields[6];
+  document.getElementById("monthlyPayment").value = fields[7];
+  document.getElementById("balloonTerm").value = fields[8];
+  document.getElementById("amortization").value = fields[9];
+  document.getElementById("insurance").value = fields[10];
+  document.getElementById("taxes").value = fields[11];
+  document.getElementById("closeEscrow").value = fields[18];
+  document.getElementById("emd").value = fields[19];
+});
     for (const [i, id] of Object.entries(fieldMap)) {
       if (values[i]) {
         const field = document.getElementById(id);
