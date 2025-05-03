@@ -1,8 +1,9 @@
+// ✅ Updated tsvParser.js
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
 BulkLOI.parseTSVInput = function(tsvText) {
-  const cleanedText = tsvText.replace(/^\ufeff/, '');
+  const cleanedText = tsvText.replace(/^﻿/, '');
   const lines = cleanedText.trim().split('\n').filter(line => line.trim() !== "");
   const rows = lines.map(line => line.split('\t'));
 
@@ -53,3 +54,4 @@ function normalizeTone(input) {
   };
   return map[input] || "professional";
 }
+
