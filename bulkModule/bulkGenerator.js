@@ -10,23 +10,23 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalToneStyle) {
 
   for (let index = 0; index < deals.length; index++) {
     const deal = deals[index];
-    const toneStyle = deal.toneStyle || globalToneStyle;
-    const normalizedTone = normalizeTone(toneStyle);
+    const actualToneStyle = deal.toneStyle || globalToneStyle;
 
-    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", normalizedTone, toneTemplates);
+    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", actualToneStyle, toneTemplates);
 
-    let cashDeal = { ...deal };
-    const listed = parseFloat(cashDeal["Listed Price"]);
-    if (!isNaN(listed)) {
-      cashDeal["Purchase Price"] = (listed * 0.68).toFixed(2);
+    // Fallback tone for cash if selected tone doesn't exist
+    let cashTone = actualToneStyle;
+    const cashKey = `cash-${normalizeTone(cashTone)}`;
+    if (!toneTemplates[cashKey]) {
+      cashTone = "professional";
     }
 
-    const cashLOI = generateLOI(cashDeal, "cash", "professional", toneTemplates);
+    const cashLOI = generateLOI(deal, "cash", cashTone, toneTemplates);
 
+    const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
     const container = document.createElement("div");
     container.className = "deal-loi-container border rounded-lg mb-4 shadow";
 
-    const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
     const header = document.createElement("button");
     header.className = "deal-header w-full text-left font-semibold text-lg p-3 bg-gray-100 hover:bg-gray-200";
     header.innerHTML = `${fullAddress} <span class='toggle-icon'>▼</span>`;
@@ -40,9 +40,11 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalToneStyle) {
       icon.textContent = content.classList.contains("hidden") ? "▼" : "▲";
     });
 
-    content.appendChild(createOfferBlock("Seller Finance LOI", sellerFinanceLOI));
-    content.appendChild(createOfferBlock("Cash Offer LOI", cashLOI));
+    const sfBlock = createOfferBlock("Seller Finance LOI", sellerFinanceLOI);
+    const cashBlock = createOfferBlock("Cash Offer LOI", cashLOI);
 
+    content.appendChild(sfBlock);
+    content.appendChild(cashBlock);
     container.appendChild(header);
     container.appendChild(content);
     outputContainer.appendChild(container);
@@ -50,17 +52,27 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalToneStyle) {
 };
 
 function generateLOI(deal, offerType, tone, toneTemplates) {
-  const key = `${offerType}-${tone}`;
+  const key = `${offerType}-${normalizeTone(tone)}`;
   const toneData = toneTemplates[key];
 
   if (!toneData || !Array.isArray(toneData.sections)) {
+    console.error("Missing or invalid tone template:", key);
     return `<p style='color:red;'>Template not found: ${key}</p>`;
+  }
+
+  // Determine correct price for cash offers
+  let purchasePrice = deal["Purchase Price"];
+  if (offerType === "cash") {
+    const listed = parseFloat(deal["Listed Price"]);
+    if (!isNaN(listed)) {
+      purchasePrice = (listed * 0.68).toFixed(2);
+    }
   }
 
   const formData = {
     agent: deal.agent || "",
     address: deal["Full Address"] || "",
-    price: formatCurrency(deal["Purchase Price"]),
+    price: formatCurrency(purchasePrice),
     down: formatCurrency(deal["Down Payment"]),
     monthly: formatCurrency(deal["Monthly Payment (PITI)"]),
     rate: deal["Interest Rate"] ? parseFloat(deal["Interest Rate"]).toFixed(2) + "%" : "",
@@ -109,6 +121,7 @@ function createOfferBlock(title, htmlContent) {
   block.appendChild(heading);
   block.appendChild(content);
   block.appendChild(copyBtn);
+
   return block;
 }
 
@@ -147,10 +160,9 @@ async function preloadTones() {
     try {
       const res = await fetch(`tones/${key}.json`);
       tones[key] = await res.json();
-    } catch {
-      console.warn(`Missing tone file: ${key}`);
+    } catch (err) {
+      console.warn(`Tone template not found: ${key}`);
     }
   }
   return tones;
 }
-
