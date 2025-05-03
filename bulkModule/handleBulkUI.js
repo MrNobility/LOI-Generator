@@ -8,11 +8,6 @@ var BulkLOI = window.BulkLOI;
  */
 BulkLOI.handleBulkGenerate = function () {
   const tsvText = document.getElementById('tsvInput')?.value || "";
-
-  const globalOfferType = (document.getElementById('globalOfferType')?.value || "Seller Finance")
-    .toLowerCase()
-    .replace(/\s/g, ''); // Converts "Seller Finance" => "sellerFinance"
-
   const globalToneStyle = document.getElementById('globalToneStyle')?.value || "professional";
 
   const deals = BulkLOI.parseTSVInput(tsvText);
@@ -22,5 +17,5 @@ BulkLOI.handleBulkGenerate = function () {
     return;
   }
 
-  BulkLOI.bulkGenerateLOIs(deals, globalOfferType, globalToneStyle);
+  BulkLOI.bulkGenerateLOIs(deals, globalToneStyle);
 };
