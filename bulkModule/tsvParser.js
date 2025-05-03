@@ -30,8 +30,6 @@ BulkLOI.parseTSVInput = function(tsvText) {
       "Monthly Taxes": row[11],
       "Close of Escrow": row[18],
       "EMD": row[19],
-      // Only override if values exist in TSV
-      "offerType": row[30] ? (row[30].trim().toLowerCase().includes("cash") ? "cash" : "sellerFinance") : undefined,
       "toneStyle": row[31] ? normalizeTone(row[31].trim()) : undefined,
       "yourName": "Dalton Eddleman",
       "yourPhone": "512-265-5448",
