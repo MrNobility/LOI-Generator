@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   document.getElementById("parseBtn").addEventListener("click", function () {
-    const raw = document.getElementById("tsvInput").value.trim();
+    const tsv = document.getElementById("tsvRowInput")?.value || document.getElementById("tsvInput")?.value || "";
     const values = raw.split("\t").length === 1 ? raw.split("\t") : raw.split("\t");
 
     for (const [i, id] of Object.entries(fieldMap)) {
