@@ -1,73 +1,129 @@
+// Full-featured bulk LOI generator with tone preloading, formatted output, and per-offer copy buttons
+
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
-/**
- * Generates and displays LOIs for each parsed deal.
- * Always includes both Seller Finance and Cash LOIs.
- */
-BulkLOI.bulkGenerateLOIs = function(deals, globalOfferType, globalToneStyle) {
-  const outputContainer = document.getElementById('bulk-loi-output');
+BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneStyle) {
+  const outputContainer = document.getElementById("bulk-loi-output");
+  outputContainer.innerHTML = "Loading...";
+
+  const toneTemplates = await preloadTones();
   outputContainer.innerHTML = "";
 
-  deals.forEach((deal, index) => {
-    const offerType = deal["offerType"] || globalOfferType;
-    const toneStyle = deal["toneStyle"] || globalToneStyle;
+  for (let index = 0; index < deals.length; index++) {
+    const deal = deals[index];
 
-    const sellerFinanceLOI = generateLOI({ ...deal, offerType: "Seller Finance", toneStyle });
-    const cashLOI = generateLOI({ ...deal, offerType: "Cash", toneStyle });
+    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", globalToneStyle, toneTemplates);
+    const cashLOI = generateLOI(deal, "cash", globalToneStyle, toneTemplates);
 
-    const formattedBlock = renderCollapsibleLOIBlock({
-      fullAddress: deal["Full Address"] || `Deal #${index + 1}`,
-      sellerFinanceLOI,
-      cashLOI
-    }, index);
+    const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
+    const container = document.createElement("div");
+    container.className = "deal-loi-container border rounded-lg mb-4 shadow";
 
-    outputContainer.appendChild(formattedBlock);
-  });
+    const header = document.createElement("button");
+    header.className = "deal-header w-full text-left font-semibold text-lg p-3 bg-gray-100 hover:bg-gray-200";
+    header.innerHTML = `${fullAddress} <span class='toggle-icon'>▼</span>`;
+
+    const content = document.createElement("div");
+    content.className = "deal-content p-4 hidden transition-all";
+
+    header.addEventListener("click", () => {
+      content.classList.toggle("hidden");
+      const icon = header.querySelector(".toggle-icon");
+      icon.textContent = content.classList.contains("hidden") ? "▼" : "▲";
+    });
+
+    const sfBlock = createOfferBlock("Seller Finance LOI", sellerFinanceLOI);
+    const cashBlock = createOfferBlock("Cash Offer LOI", cashLOI);
+
+    content.appendChild(sfBlock);
+    content.appendChild(cashBlock);
+    container.appendChild(header);
+    container.appendChild(content);
+    outputContainer.appendChild(container);
+  }
 };
 
-/**
- * Creates a collapsible block for each deal with styled LOI sections.
- */
-function renderCollapsibleLOIBlock(dealData, index) {
-  const container = document.createElement("div");
-  container.className = "deal-loi-container border rounded-lg mb-4 shadow transition";
+function createOfferBlock(title, htmlContent) {
+  const block = document.createElement("div");
+  block.className = "mb-6 p-4 border-l-4 rounded bg-gray-50";
 
-  // Header toggle button
-  const header = document.createElement("button");
-  header.className = "deal-header w-full text-left font-semibold text-lg p-3 bg-gray-100 hover:bg-gray-200";
-  header.innerHTML = `Deal ${index + 1}: ${dealData.fullAddress || "Unnamed Property"} <span class="toggle-icon">▼</span>`;
+  const heading = document.createElement("h3");
+  heading.className = "font-bold mb-2";
+  heading.textContent = title;
 
   const content = document.createElement("div");
-  content.className = "deal-content p-4 hidden transition-all";
+  content.className = "loi-content mb-2 text-sm";
+  content.innerHTML = htmlContent;
 
-  // Toggle functionality
-  header.addEventListener("click", () => {
-    content.classList.toggle("hidden");
-    const icon = header.querySelector(".toggle-icon");
-    icon.textContent = content.classList.contains("hidden") ? "▼" : "▲";
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
+  copyBtn.textContent = "Copy to Clipboard";
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(content.innerText).then(() => {
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => (copyBtn.textContent = "Copy to Clipboard"), 1500);
+    });
   });
 
-  // Seller Finance Block
-  const sellerFinanceBlock = document.createElement("div");
-  sellerFinanceBlock.className = "seller-finance-block mb-6 p-4 border-l-4 border-blue-400 bg-blue-50 rounded";
-  sellerFinanceBlock.innerHTML = `
-    <h3 class="font-bold mb-2 text-blue-700">Seller Finance LOI</h3>
-    ${dealData.sellerFinanceLOI}
-  `;
+  block.appendChild(heading);
+  block.appendChild(content);
+  block.appendChild(copyBtn);
 
-  // Cash Offer Block
-  const cashBlock = document.createElement("div");
-  cashBlock.className = "cash-block p-4 border-l-4 border-green-400 bg-green-50 rounded";
-  cashBlock.innerHTML = `
-    <h3 class="font-bold mb-2 text-green-700">Cash Offer LOI</h3>
-    ${dealData.cashLOI}
-  `;
+  return block;
+}
 
-  content.appendChild(sellerFinanceBlock);
-  content.appendChild(cashBlock);
-  container.appendChild(header);
-  container.appendChild(content);
+function formatCurrency(value) {
+  const num = parseFloat(value);
+  if (isNaN(num)) return "";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  }).format(num);
+}
 
-  return container;
+async function preloadTones() {
+  const toneFiles = [
+    { offerType: "sellerFinance", tone: "marketReality" },
+    { offerType: "sellerFinance", tone: "professional" },
+    { offerType: "cash", tone: "professional" }
+  ];
+  const tones = {};
+  for (const { offerType, tone } of toneFiles) {
+    const key = `${offerType}-${tone}`;
+    const res = await fetch(`tones/${key}.json`);
+    tones[key] = await res.json();
+  }
+  return tones;
+}
+
+function generateLOI(deal, offerType, tone, toneTemplates) {
+  const toneData = toneTemplates[`${offerType}-${tone}`];
+  if (!toneData) return `<p style='color:red;'>Missing tone: ${offerType}-${tone}</p>`;
+
+  const formData = {
+    agent: deal.agent || "",
+    address: deal["Full Address"] || "",
+    price: formatCurrency(deal["Purchase Price"]),
+    down: formatCurrency(deal["Down Payment"]),
+    monthly: formatCurrency(deal["Monthly Payment (PITI)"]),
+    rate: deal["Interest Rate"] ? parseFloat(deal["Interest Rate"]).toFixed(2) + "%" : "",
+    balloon: deal["Balloon Term"] ? deal["Balloon Term"] + " years" : "",
+    amort: deal["Amortization"] ? deal["Amortization"] + " years" : "",
+    insurance: formatCurrency(deal["Monthly Insurance"]),
+    taxes: formatCurrency(deal["Monthly Taxes"]),
+    closeEscrow: deal["Close of Escrow"] || "",
+    emd: formatCurrency(deal["EMD"]),
+    yourName: deal.yourName || "",
+    yourPhone: deal.yourPhone || "",
+    yourEmail: deal.yourEmail || ""
+  };
+
+  const body = toneData.sections.map(section =>
+    section.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "")
+  ).join("<br><br>");
+
+  const subject = toneData.subject.replace(/{{(\w+?)}}/g, (_, key) => formData[key] || "");
+
+  return `<strong>Subject:</strong> ${subject}<br><br>${body}`;
 }
