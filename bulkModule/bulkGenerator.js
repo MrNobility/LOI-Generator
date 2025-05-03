@@ -10,7 +10,6 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalToneStyle) {
 
   for (let index = 0; index < deals.length; index++) {
     const deal = deals[index];
-
     const actualToneStyle = deal.toneStyle || globalToneStyle;
 
     const sellerFinanceLOI = generateLOI(deal, "sellerFinance", actualToneStyle, toneTemplates);
@@ -51,6 +50,7 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalToneStyle) {
     outputContainer.appendChild(container);
   }
 };
+
 function generateLOI(deal, offerType, tone, toneTemplates) {
   const key = `${offerType}-${normalizeTone(tone)}`;
   const toneData = toneTemplates[key];
@@ -98,7 +98,7 @@ function generateLOI(deal, offerType, tone, toneTemplates) {
   return `<strong>Subject:</strong> ${subject}<br><br>${filledSections}`;
 }
 
-  function createOfferBlock(title, htmlContent) {
+function createOfferBlock(title, htmlContent) {
   const block = document.createElement("div");
   block.className = "mb-6 p-4 border-l-4 rounded bg-gray-50";
 
