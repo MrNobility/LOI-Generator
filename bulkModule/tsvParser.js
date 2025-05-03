@@ -30,8 +30,9 @@ BulkLOI.parseTSVInput = function(tsvText) {
       "Monthly Taxes": row[11],
       "Close of Escrow": row[18],
       "EMD": row[19],
-      "offerType": row[30]?.trim().toLowerCase().includes("cash") ? "cash" : "sellerFinance",
-      "toneStyle": normalizeTone(row[31]?.trim()),
+      // Only override if values exist in TSV
+      "offerType": row[30] ? (row[30].trim().toLowerCase().includes("cash") ? "cash" : "sellerFinance") : undefined,
+      "toneStyle": row[31] ? normalizeTone(row[31].trim()) : undefined,
       "yourName": "Dalton Eddleman",
       "yourPhone": "512-265-5448",
       "yourEmail": "Mr.Nobility@nobility.network",
@@ -41,7 +42,6 @@ BulkLOI.parseTSVInput = function(tsvText) {
   });
 };
 
-// Map human-readable tone names to internal keys
 function normalizeTone(input) {
   const map = {
     "Seller Finance Acquisitions": "professional",
