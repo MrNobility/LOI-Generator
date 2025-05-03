@@ -1,5 +1,3 @@
-// ✅ Rewritten bulkGenerator.js — full persuasive email generation with collapsible sections and copy buttons
-
 window.BulkLOI = window.BulkLOI || {};
 var BulkLOI = window.BulkLOI;
 
@@ -33,9 +31,11 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneSty
       icon.textContent = content.classList.contains("hidden") ? "▼" : "▲";
     });
 
-    content.appendChild(createOfferBlock("Seller Finance LOI", sellerFinanceLOI));
-    content.appendChild(createOfferBlock("Cash Offer LOI", cashLOI));
+    const sfBlock = createOfferBlock("Seller Finance LOI", sellerFinanceLOI);
+    const cashBlock = createOfferBlock("Cash Offer LOI", cashLOI);
 
+    content.appendChild(sfBlock);
+    content.appendChild(cashBlock);
     container.appendChild(header);
     container.appendChild(content);
     outputContainer.appendChild(container);
@@ -58,25 +58,23 @@ function createOfferBlock(title, htmlContent) {
   copyBtn.className = "px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600";
   copyBtn.textContent = "Copy to Clipboard";
   copyBtn.addEventListener("click", () => {
-    const temp = document.createElement("textarea");
-    temp.value = content.innerText;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand("copy");
-    document.body.removeChild(temp);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => (copyBtn.textContent = "Copy to Clipboard"), 1500);
+    navigator.clipboard.writeText(content.innerText).then(() => {
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => (copyBtn.textContent = "Copy to Clipboard"), 1500);
+    });
   });
 
   block.appendChild(heading);
   block.appendChild(content);
   block.appendChild(copyBtn);
+
   return block;
 }
 
 function formatCurrency(value) {
   const num = parseFloat(value);
-  return isNaN(num) ? "" : new Intl.NumberFormat("en-US", {
+  if (isNaN(num)) return "";
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
   }).format(num);
@@ -88,7 +86,10 @@ function normalizeTone(input) {
     "Market Reality": "marketReality",
     "Professional": "professional",
     "professional": "professional",
-    "marketReality": "marketReality"
+    "marketReality": "marketReality",
+    "": "professional",
+    null: "professional",
+    undefined: "professional"
   };
   return map[input] || "professional";
 }
