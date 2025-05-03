@@ -11,8 +11,12 @@ BulkLOI.bulkGenerateLOIs = async function (deals, globalOfferType, globalToneSty
   for (let index = 0; index < deals.length; index++) {
     const deal = deals[index];
 
-    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", globalToneStyle, toneTemplates);
-    const cashLOI = generateLOI(deal, "cash", globalToneStyle, toneTemplates);
+    const actualOfferType = deal.offerType || globalOfferType;
+    const actualToneStyle = deal.toneStyle || globalToneStyle;
+
+    const sellerFinanceLOI = generateLOI(deal, "sellerFinance", actualToneStyle, toneTemplates);
+    const cashLOI = generateLOI(deal, "cash", actualToneStyle, toneTemplates);
+
 
     const fullAddress = deal["Full Address"] || `Deal #${index + 1}`;
     const container = document.createElement("div");
